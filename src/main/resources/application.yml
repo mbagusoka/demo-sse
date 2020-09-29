@@ -1,0 +1,4 @@
+app:
+  sse:
+    timeout: 15000
+    delay: 2
