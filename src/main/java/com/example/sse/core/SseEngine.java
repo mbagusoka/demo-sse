@@ -2,7 +2,6 @@ package com.example.sse.core;
 
 import com.example.sse.enums.Status;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
@@ -22,12 +21,6 @@ public class SseEngine<S> {
     private final SseEmitter emitter;
     private final ScheduledExecutorService executor;
 
-    @Value("${app.sse.timeout:0x7fffffffffffffffL}")
-    private long timeout;
-
-    @Value("${app.sse.delay:5}")
-    private long delay;
-
     private SseEngine(Supplier<S> supplier, Predicate<S> predicate, String key) {
         this.supplier = supplier;
         this.predicate = predicate;
@@ -42,7 +35,7 @@ public class SseEngine<S> {
     }
 
     private SseEmitter invoke() {
-        SseEmitter sseEmitter = new SseEmitter(timeout);
+        SseEmitter sseEmitter = new SseEmitter(15000L);
         sseEmitter.onCompletion(this::finishEmitter);
         sseEmitter.onTimeout(this::finishEmitter);
         sseEmitter.onError(this::handleError);
@@ -52,7 +45,7 @@ public class SseEngine<S> {
     public void start() {
         try {
             emitter.send(SseEmitter.event().name(key).data(status));
-            executor.scheduleWithFixedDelay(this::checkStatus, 0, delay, TimeUnit.SECONDS);
+            executor.scheduleWithFixedDelay(this::checkStatus, 0, 2, TimeUnit.SECONDS);
         } catch (IOException e) {
             handleError(e);
         }
@@ -67,7 +60,7 @@ public class SseEngine<S> {
         if (predicate.test(supplier.get())) {
             try {
                 emitter.send(SseEmitter.event().name(key).data(supplier.get()));
-//                emitter.complete();
+                emitter.complete();
             } catch (IOException e) {
                 handleError(e);
             }
