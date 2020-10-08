@@ -1,10 +1,13 @@
 package com.example.sse.core;
 
+import com.example.sse.controller.Person;
 import com.example.sse.enums.Status;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -35,7 +38,7 @@ public class SseEngine<S> {
     }
 
     private SseEmitter invoke() {
-        SseEmitter sseEmitter = new SseEmitter(15000L);
+        SseEmitter sseEmitter = new SseEmitter(10000L);
         sseEmitter.onCompletion(this::finishEmitter);
         sseEmitter.onTimeout(this::finishEmitter);
         sseEmitter.onError(this::handleError);
@@ -44,16 +47,17 @@ public class SseEngine<S> {
 
     public void start() {
         try {
-            emitter.send(SseEmitter.event().name(key).data(status));
-            executor.scheduleWithFixedDelay(this::checkStatus, 0, 2, TimeUnit.SECONDS);
+            emitter.send(SseEmitter.event().name(key)
+                .data(new PageImpl<>(Collections.singletonList(Person.of("DUMMY", status)))));
+            executor.scheduleWithFixedDelay(this::checkStatus, 2, 2, TimeUnit.SECONDS);
         } catch (IOException e) {
             handleError(e);
         }
     }
 
     private void finishEmitter() {
-        log.info("Finish Emitter [{}]", Thread.currentThread());
         executor.shutdown();
+        log.info("Finish Emitter [{}] and Executor is shutdown [{}]", Thread.currentThread(), executor.isShutdown() );
     }
 
     private void checkStatus() {
