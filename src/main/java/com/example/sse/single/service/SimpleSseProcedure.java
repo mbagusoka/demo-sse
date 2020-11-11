@@ -4,7 +4,6 @@ import com.example.sse.core.SseProcedure;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -16,13 +15,13 @@ public class SimpleSseProcedure implements SseProcedure {
 
     private final ScheduledExecutorService executor;
 
-    private SimpleSseProcedure(Consumer<SseEmitter> action) {
+    private SimpleSseProcedure(Consumer<SseEmitter> action, ScheduledExecutorService executor) {
         this.action = action;
-        this.executor = Executors.newSingleThreadScheduledExecutor();
+        this.executor = executor;
     }
 
-    public static SimpleSseProcedure valueOf(Consumer<SseEmitter> action) {
-        return new SimpleSseProcedure(action);
+    public static SimpleSseProcedure valueOf(Consumer<SseEmitter> action, ScheduledExecutorService executor) {
+        return new SimpleSseProcedure(action, executor);
     }
 
     @Override
@@ -32,7 +31,6 @@ public class SimpleSseProcedure implements SseProcedure {
 
     @Override
     public void cleanUp() {
-        executor.shutdown();
-        log.info("End emitter [{}] and shutdown executor [{}]", Thread.currentThread(), executor.isShutdown());
+        log.info("End emitter [{}]", Thread.currentThread());
     }
 }
