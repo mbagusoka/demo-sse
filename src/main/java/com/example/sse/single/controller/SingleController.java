@@ -1,7 +1,7 @@
 package com.example.sse.single.controller;
 
 import com.example.sse.core.SseProcedure;
-import com.example.sse.single.common.SseTemplate;
+import com.example.sse.core.SseTemplate;
 import com.example.sse.single.service.SseProcedureProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +20,7 @@ public class SingleController {
     @GetMapping
     public SseEmitter get(@RequestParam String name) {
         SseProcedure procedure = provider.get(name);
-        SseTemplate sseTemplate = SseTemplate.valueOf(procedure, 5000L);
+        SseTemplate sseTemplate = SseTemplate.valueOf(procedure, Long.MAX_VALUE);
         sseTemplate.start();
         return sseTemplate.get();
     }

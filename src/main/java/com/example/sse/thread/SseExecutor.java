@@ -19,13 +19,13 @@ public class SseExecutor {
     }
 
     @PostConstruct
-    public void postConstruct() {
+    private void postConstruct() {
         executor = Executors.newSingleThreadScheduledExecutor();
         log.info("SSE Executor Start");
     }
 
     @PreDestroy
-    public void preDestroy() {
+    private void preDestroy() {
         executor.shutdown();
         log.info("SSE Executor Shutdown");
     }

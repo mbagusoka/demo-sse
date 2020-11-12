@@ -1,6 +1,5 @@
 package com.example.sse.core;
 
-import com.example.sse.single.common.SseTemplate;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 /**

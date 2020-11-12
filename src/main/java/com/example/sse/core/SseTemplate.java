@@ -1,7 +1,5 @@
-package com.example.sse.single.common;
+package com.example.sse.core;
 
-import com.example.sse.core.SseOperations;
-import com.example.sse.core.SseProcedure;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 /**
